@@ -58,6 +58,11 @@ export interface Park {
   image?: ParkImage;
   /** O diferencial em poucas palavras, com ícone, na lista dos aquáticos. */
   highlight?: string;
+  /**
+   * Versão de bolso para o card (uma frase + três fichas). Resume a copy longa
+   * acima sem dizer nada que ela não diga; a longa continua no "Ver detalhes".
+   */
+  short?: { tagline: string; age: string; days: string; when: string };
 }
 
 export const PARKS: Park[] = [
@@ -82,6 +87,7 @@ export const PARKS: Park[] = [
       license: { name: 'Licença Unsplash', url: 'https://unsplash.com/license', author: 'Pietra K.' },
     },
     href: '/beto-carrero/',
+    short: { tagline: 'Montanha-russa, zoológico e show de dublê no mesmo ingresso.', age: 'Todas', days: '3 a 4', when: 'Fora de jan e jul' },
   },
   {
     slug: 'hopi-hari',
@@ -104,6 +110,7 @@ export const PARKS: Park[] = [
       license: { name: 'Licença Unsplash', url: 'https://unsplash.com/license', author: 'Blond Fox' },
     },
     href: '/hopi-hari/',
+    short: { tagline: 'O parque radical de São Paulo. Cabe num bate-volta.', age: '7 anos ou mais', days: '1', when: 'Dia de semana' },
   },
   {
     slug: 'thermas-dos-laranjais',
@@ -119,6 +126,7 @@ export const PARKS: Park[] = [
     days: '2 a 3 dias',
     when: 'O ano todo. É o único parque aquático daqui que não perde a graça em julho.',
     highlight: 'Água termal natural',
+    short: { tagline: 'Piscina de água quente o dia todo, faça sol ou não.', age: 'Todas', days: '2 a 3', when: 'O ano todo' },
   },
   {
     slug: 'beach-park',
@@ -147,6 +155,7 @@ export const PARKS: Park[] = [
       },
     },
     highlight: 'Parque e praia no mesmo lugar',
+    short: { tagline: 'Tobogã de manhã, praia à tarde.', age: 'Todas', days: '4 a 5', when: 'Jul a jan' },
   },
   {
     slug: 'hot-park',
@@ -162,6 +171,7 @@ export const PARKS: Park[] = [
     days: '3 a 4 dias',
     when: 'Maio a setembro, a seca goiana. Chove pouco e a água quente compensa a noite fria.',
     highlight: 'Água termal e resort',
+    short: { tagline: 'Rio de água quente no meio do cerrado.', age: 'Todas', days: '3 a 4', when: 'Mai a set' },
   },
   {
     slug: 'cacau-park',
@@ -185,8 +195,8 @@ export const UPCOMING_PARKS = PARKS.filter((park) => park.tier === 'emBreve');
 /** Parques vendáveis hoje — o Cacau Park fica de fora da comparação. */
 export const BOOKABLE_PARKS = PARKS.filter((park) => park.tier !== 'emBreve');
 
-/** Os três do mosaico do hero: um temático e dois aquáticos de regiões diferentes. */
-export const HERO_PARK_SLUGS = ['beto-carrero', 'hopi-hari', 'beach-park'] as const;
+/** A foto que ocupa o hero inteiro: precisa ter foto com direito de uso. */
+export const HERO_PARK_SLUG = 'beto-carrero';
 
 export const PARQUES_FAQ_ITEMS = [
   {

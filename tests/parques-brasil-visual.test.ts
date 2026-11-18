@@ -9,7 +9,7 @@ import { MemoryRouter } from 'react-router-dom';
 import ParquesBrasil from '../pages/ParquesBrasil.tsx';
 import { ParkPhoto } from '../components/parques-brasil/ParkPhoto.tsx';
 import { CACAU_WAITLIST_SOURCE, CacauWaitlist } from '../components/parques-brasil/CacauWaitlist.tsx';
-import { BOOKABLE_PARKS, HERO_PARK_SLUGS, PARKS } from '../components/parques-brasil/constants.ts';
+import { BOOKABLE_PARKS, HERO_PARK_SLUG, PARKS } from '../components/parques-brasil/constants.ts';
 import { pushWaitlistSignupDataLayerEvent } from '../hooks/useWaitlistCapture.ts';
 import type { SubmitWaitlistRequest } from '../types/waitlist.ts';
 
@@ -55,11 +55,9 @@ test('no mosaico, o crédito fica no topo e não disputa o rodapé com o nome do
   assert.match(container.querySelector('figcaption')!.className, /\bbottom-1\b/);
 });
 
-test('o mosaico do hero só usa parques que já têm foto', () => {
-  for (const slug of HERO_PARK_SLUGS) {
-    const park = PARKS.find((item) => item.slug === slug);
-    assert.ok(park?.image, `${slug} está no hero sem foto`);
-  }
+test('a foto do hero é de um parque que já tem foto com direito de uso', () => {
+  const park = PARKS.find((item) => item.slug === HERO_PARK_SLUG);
+  assert.ok(park?.image, `${HERO_PARK_SLUG} está no hero sem foto`);
 });
 
 test('toda foto de parque diz de onde veio e quem fez', () => {
@@ -94,13 +92,35 @@ test('foto CC BY-SA tem link para a origem e para a licença, avisando do recort
   assert.match(credits.textContent ?? '', /Paulo JC Nogueira, foto recortada/);
 });
 
-test('no hero só a primeira foto carrega com prioridade', () => {
+test('o hero tem uma foto só, grande, carregada com prioridade e com crédito', () => {
   const { container } = render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
-  const heroImages = Array.from(container.querySelectorAll('section')[0].querySelectorAll('img'));
+  const hero = container.querySelectorAll('section')[0];
+  const heroImages = Array.from(hero.querySelectorAll('img'));
   assert.deepEqual(
-    heroImages.map((img) => img.getAttribute('loading')),
-    ['eager', 'lazy', 'lazy'],
+    heroImages.map((img) => [img.getAttribute('loading'), img.getAttribute('fetchpriority')]),
+    [['eager', 'high']],
   );
+  assert.match(hero.querySelector('figcaption')?.textContent ?? '', /Unsplash/);
+});
+
+test('o card do parque mostra a versão curta e guarda a copy longa em Ver detalhes', () => {
+  const { container } = render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
+  for (const park of BOOKABLE_PARKS) {
+    const card = container.querySelector(`#parque-${park.slug}`);
+    assert.ok(card, `${park.slug} sem card`);
+    assert.ok(park.short, `${park.slug} sem versão curta`);
+    assert.ok(card.textContent?.includes(park.short.tagline), `${park.slug} sem a frase curta`);
+    const details = card.querySelector('details');
+    assert.ok(details?.textContent?.includes(park.bestFor), `${park.slug} sem "Rende mais para" nos detalhes`);
+  }
+});
+
+test('só os credenciados ganham o carimbo de agente credenciado', () => {
+  const { container } = render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
+  for (const park of BOOKABLE_PARKS) {
+    const stamped = /Agente\s*credenciado/i.test(container.querySelector(`#parque-${park.slug}`)?.textContent ?? '');
+    assert.equal(stamped, park.tier === 'credenciado', `${park.slug}: carimbo errado`);
+  }
 });
 
 test('a comparação é só a tabela, sem uma segunda versão em cards para o mobile', () => {
