@@ -154,9 +154,9 @@ const Hero: React.FC = memo(() => {
             <span className="block text-sm sm:text-base font-semibold text-white/80 tracking-widest uppercase mb-3 leading-normal">
               Agência de Viagens em São Paulo
             </span>
-            Sua Próxima <br />
+            Sua próxima <br />
             <span className="text-anhanga-yellow relative inline-block pb-2">
-              {validCityForTitle ? `Aventura em ${validCityForTitle}` : 'Aventura'}
+              {validCityForTitle ? `aventura em ${validCityForTitle}` : 'aventura'}
 
               {/* Underline Scribble - orgânico via Framer Motion pathLength */}
               <svg className="absolute w-full h-4 -bottom-0 left-0 text-anhanga-yellow overflow-visible" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -187,7 +187,7 @@ const Hero: React.FC = memo(() => {
 
           {/* Micro-texto abaixo da barra de busca */}
           <p className="text-sm text-white/70 text-center mt-3">
-            Sem compromisso • Retorno humano em até 2h úteis
+            Retorno humano em até 2h úteis
           </p>
 
           <AIResearchBar />

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Calendar, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 // Teaser dedicado (só os N posts mais recentes, campos mínimos) em vez de getAllPosts() —
 // a home é renderizada de forma síncrona (ver ssr.tsx) e paga o custo de qualquer import
 // estático; o manifesto completo (data/blogManifest.ts) inclui faq[]/tags[] de todos os
@@ -37,15 +37,9 @@ const Blog: React.FC = memo(() => {
             <div className="container mx-auto px-6 relative z-10">
                 {/* Header Section */}
                 <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-brand-dark bg-brand-yellow text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] transform -rotate-2 mb-4">
-                        <BookOpen className="size-4" /> Diário de Bordo
-                    </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4">
-                        Histórias & <span className="text-anhanga-actionInk border-b-8 border-brand-cyan/20 px-1 inline-block">Dicas</span>
+                    <h2 className="text-4xl md:text-5xl font-black text-brand-dark">
+                        Histórias e <span className="text-anhanga-actionInk border-b-8 border-brand-cyan/20 px-1 inline-block">dicas</span>
                     </h2>
-                    <p className="text-zinc-500 font-medium text-lg max-w-2xl mx-auto">
-                        Inspiração real para sua próxima aventura. Sem filtros, só verdades.
-                    </p>
                 </div>
 
                 {/* Featured Post Layout */}
@@ -66,9 +60,6 @@ const Blog: React.FC = memo(() => {
                                                 height={540}
                                                 className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
                                             />
-                                        </div>
-                                        <div className="absolute bottom-4 left-4 bg-white px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider text-brand-dark shadow-sm">
-                                            Destaque da Semana
                                         </div>
                                         <div className="absolute bottom-4 right-4 z-30">
                                             <SocialShare
@@ -107,7 +98,7 @@ const Blog: React.FC = memo(() => {
                                             </div>
                                         </div>
                                         <span className="flex items-center gap-2 text-anhanga-actionInk font-black uppercase tracking-wide group-hover:gap-4 transition-[gap,color]">
-                                            Ler Agora <ArrowRight className="size-5" />
+                                            Ler agora <ArrowRight className="size-5" />
                                         </span>
                                     </div>
                                 </div>
@@ -180,8 +171,7 @@ const Blog: React.FC = memo(() => {
                 {/* View More Button */}
                 <div className="mt-16 text-center">
                     <a href={getBlogHomeUrl()} className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-zinc-200 text-zinc-600 rounded-full font-bold hover:border-brand-cyan hover:text-brand-cyan transition shadow-sm hover:shadow-md group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2">
-                        <Sparkles className="size-4 text-brand-yellow fill-brand-yellow" />
-                        Ver Todos os Artigos
+                        Ver todos os artigos
                         <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
                     </a>
                 </div>

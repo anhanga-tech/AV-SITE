@@ -1,17 +1,10 @@
 import React from 'react';
-import { AirplaneTilt } from '@phosphor-icons/react';
 import { CtaTicketStub } from './cta/CtaTicketStub';
 import { CtaBody } from './cta/CtaBody';
 
 const CallToActionComponent: React.FC = () => {
     return (
         <section id="contato" className="py-24 bg-brand-light relative overflow-hidden">
-
-            {/* Background Decorations */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-10 left-10 text-9xl opacity-[0.03] rotate-12 font-black text-brand-dark">TRAVEL</div>
-                <div className="absolute bottom-10 right-10 text-9xl opacity-[0.03] -rotate-12 font-black text-brand-dark">FLY</div>
-            </div>
 
             <div className="container mx-auto px-6 relative z-10">
 
@@ -20,15 +13,6 @@ const CallToActionComponent: React.FC = () => {
 
                     {/* --- LEFT SIDE: Main Info --- */}
                     <div className="w-full md:w-[70%] p-8 md:p-12 relative flex flex-col justify-between">
-
-                        {/* Header Strip */}
-                        <div className="flex justify-between items-center mb-8 border-b-2 border-dashed border-gray-100 pb-4">
-                            <div className="flex items-center gap-2 text-anhanga-actionInk font-black tracking-widest text-sm uppercase" title="Estilo Boarding Pass">
-                                <AirplaneTilt className="size-5" weight="fill" /> Anhangá Airlines
-                                <span className="text-[10px] text-zinc-500 ml-1 hidden lg:inline">(Boarding Pass)</span>
-                            </div>
-                            <div className="text-gray-500 font-bold text-xs uppercase">First Class Experience</div>
-                        </div>
 
                         <CtaBody />
 

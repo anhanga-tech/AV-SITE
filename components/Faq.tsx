@@ -13,10 +13,9 @@ import {
 interface FAQItemProps {
     question: string;
     answer: React.ReactNode;
-    idx: number;
 }
 
-const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
+const FAQItem = memo(({ question, answer }: FAQItemProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const panelId = useId();
 
@@ -32,7 +31,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
             {/* Padrão de accordion do WAI-ARIA: o botão fica dentro do heading, e a resposta é o
                 elemento seguinte ao heading. Com o heading dentro do botão (HTML inválido), leitores
                 de tela e agentes não ligavam a pergunta à resposta, e o FAQPage reprovava no
-                IsAgentReady. O número vem de CSS para não entrar no texto da pergunta. */}
+                IsAgentReady. */}
             <h3>
                 <button
                     type="button"
@@ -41,15 +40,8 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
                     aria-expanded={isOpen}
                     aria-controls={panelId}
                 >
-                    <span className="flex items-center gap-3">
-                        <span
-                            aria-hidden="true"
-                            data-ordinal={idx + 1}
-                            className="hidden md:flex items-center justify-center size-8 rounded-full bg-brand-light text-brand-cyan text-xs font-bold before:content-[attr(data-ordinal)]"
-                        />
-                        <span className="font-bold text-lg md:text-xl text-brand-dark group-hover:text-brand-cyan transition-colors">
-                            {question}
-                        </span>
+                    <span className="font-bold text-lg md:text-xl text-brand-dark group-hover:text-brand-cyan transition-colors">
+                        {question}
                     </span>
 
                     <span className={`size-10 rounded-xl flex items-center justify-center transition duration-300 ${isOpen
@@ -219,32 +211,20 @@ const Faq = memo(() => {
 
             <div className="container mx-auto px-6 max-w-4xl">
                 <div className="text-center mb-16">
-                    <div className="inline-block bg-anhanga-action text-anhanga-dark px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest mb-4 shadow-sm transform -rotate-1">
-                        Tire suas dúvidas
-                    </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tight mb-4">
-                        Tá na cabeça?<br />
-                        <span className="text-anhanga-actionInk">
-                            A gente responde.
-                        </span>
+                    <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tight">
+                        Perguntas frequentes
                     </h2>
-                    <p className="text-lg text-zinc-500 max-w-2xl mx-auto">
-                        As perguntas que chegam mais no nosso WhatsApp, com resposta de verdade.
-                    </p>
                 </div>
 
                 <div className="space-y-4">
-                    {FAQS.map((faq, idx) => (
-                        <FAQItem key={faq.question} {...faq} idx={idx} />
+                    {FAQS.map((faq) => (
+                        <FAQItem key={faq.question} {...faq} />
                     ))}
                 </div>
 
                 {/* AI Helper Teaser */}
                 <div className="mt-16 flex justify-center">
                     <div className="bg-white/80 backdrop-blur-sm border border-brand-cyan/20 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-5 max-w-lg shadow-[0_8px_30px_rgba(14,165,233,0.1)] hover:shadow-[0_8px_30px_rgba(14,165,233,0.2)] transition-shadow cursor-default">
-                        <div className="bg-brand-light p-4 rounded-full">
-                            <Sparkle className="size-8 text-brand-cyan animate-pulse" weight="fill" />
-                        </div>
                         <div className="text-center md:text-left">
                             <h4 className="font-bold text-brand-dark text-xl mb-1">Ainda tem dúvidas?</h4>
                             <p className="text-zinc-600">

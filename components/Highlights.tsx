@@ -1,14 +1,6 @@
 import React, { memo } from 'react';
 import { m } from 'framer-motion';
 import { LazyImage } from './ui/LazyImage';
-import {
-  UserCircleCheck,
-  Sparkle,
-  ClipboardText,
-  Compass,
-  ShieldCheck,
-  ArrowRight,
-} from '@phosphor-icons/react';
 import { openContactModal } from '../utils/contactForm';
 
 const fadeUp = {
@@ -25,51 +17,36 @@ const fadeUp = {
 };
 
 interface HighlightItem {
-    icon: React.ElementType;
     title: string;
     description: string;
-    bg: string;
     accent: string;
-    iconColor: string;
     rotate: string;
 }
 
 // Moved outside component to prevent re-allocation on every render
 const HIGHLIGHTS: HighlightItem[] = [
     {
-        icon: UserCircleCheck,
         title: "Concierge humano",
         description: "Você começa pelo chat e nossa equipe humana continua com orientação de verdade.",
-        bg: "bg-orange-100",
         accent: "border-orange-200",
-        iconColor: "text-orange-600",
         rotate: "-rotate-1"
     },
     {
-        icon: Sparkle,
         title: "Roteiros à mão",
         description: "Desenhamos cada dia da viagem do zero, só pra você.",
-        bg: "bg-emerald-100",
         accent: "border-emerald-200",
-        iconColor: "text-emerald-600",
         rotate: "rotate-2"
     },
     {
-        icon: ClipboardText,
         title: "Zero burocracia",
         description: "Vistos, formulários e chatices? Deixa com a gente.",
-        bg: "bg-blue-100",
         accent: "border-blue-200",
-        iconColor: "text-blue-600",
         rotate: "-rotate-2"
     },
     {
-        icon: Compass,
         title: "Achados secretos",
         description: "Lugares autênticos que não estão na primeira página do Google.",
-        bg: "bg-emerald-100",
         accent: "border-emerald-200",
-        iconColor: "text-emerald-600",
         rotate: "rotate-1"
     }
 ];
@@ -107,20 +84,15 @@ const Highlights = memo(() => {
                             >
                                 <LazyImage
                                     src="images/highlights/experiencia-caribe.jpg"
-                                    alt="Família em praia paradisíaca com areia branca e água turquesa — pacote de viagem personalizado da Anhangá Viagens, agência em São Paulo"
+                                    alt="Família em praia paradisíaca com areia branca e água turquesa, pacote de viagem personalizado da Anhangá Viagens, agência em São Paulo"
                                     width={800}
                                     height={600}
                                     className="w-full object-cover aspect-[4/3]"
                                 />
-                                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold text-zinc-700 shadow-sm transition-transform duration-300 group-hover:scale-110">
-                                    📍 Caribe? Talvez.
-                                </div>
                             </m.div>
                         </div>
 
                         <div className="bg-white p-8 rounded-[2rem] border-2 border-zinc-100 shadow-[8px_8px_0px_rgba(0,0,0,0.05)] text-center lg:text-left">
-                            {/* Changed h4 to p to maintain correct heading hierarchy and avoid SEO audit findings. */}
-                            <p className="font-black text-2xl text-zinc-900 mb-2">Viaje Leve! 🎈</p>
                             <p className="text-zinc-500 text-lg mb-6 leading-relaxed">
                                 Comece a planejar agora e receba um roteiro prévio sem compromisso.
                             </p>
@@ -132,8 +104,7 @@ const Highlights = memo(() => {
                                 }}
                                 className="flex items-center justify-center gap-3 w-full bg-brand-dark text-white px-6 py-4 rounded-xl font-bold transition duration-300 ease-spring shadow-[4px_4px_0px_#94a3b8] hover:shadow-[2px_2px_0px_#94a3b8] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
                             >
-                                <ShieldCheck className="size-5" weight="fill" />
-                                <span>Falar com Especialista</span>
+                                <span>Falar com especialista</span>
                             </button>
                         </div>
                     </m.div>
@@ -148,16 +119,10 @@ const Highlights = memo(() => {
                             viewport={{ once: true, amount: 0.2 }}
                             custom={1}
                         >
-                            <div className="inline-block relative mb-4">
-                                <span className="absolute inset-0 bg-anhanga-blue/10 transform -skew-x-12 rounded-lg"></span>
-                                <span className="relative px-3 py-1 text-anhanga-blue font-black uppercase tracking-widest text-sm flex items-center gap-2">
-                                    <Sparkle className="size-4" weight="fill" /> O Jeito Anhangá
-                                </span>
-                            </div>
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
-                                Não existe roteiro certo <br />
+                                Cada roteiro começa <br />
                                 <span className="text-anhanga-blue">
-                                    para o viajante errado.
+                                    do zero.
                                 </span>
                             </h2>
                             <p className="text-zinc-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
@@ -167,7 +132,6 @@ const Highlights = memo(() => {
 
                         <div className="grid md:grid-cols-2 gap-8">
                             {HIGHLIGHTS.map((item, idx) => {
-                                const Icon = item.icon;
                                 const rotateVal = parseInt(item.rotate.replace('rotate-', ''), 10) || 0;
                                 return (
                                     <m.div
@@ -191,14 +155,6 @@ const Highlights = memo(() => {
                                         {/* Washi Tape */}
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-50/90 backdrop-blur-sm border-l-2 border-r-2 border-white/40 rotate-1 shadow-sm z-20 opacity-90"></div>
 
-                                        {/* Icon Badge */}
-                                        <m.div
-                                            className={`size-16 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}
-                                            whileHover={{ scale: 1.1, rotate: 6, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
-                                        >
-                                            <Icon className={`size-8 ${item.iconColor}`} weight="fill" />
-                                        </m.div>
-
                                         {/* Content */}
                                         <h3 className="text-xl font-extrabold text-zinc-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
                                             {item.title}
@@ -206,11 +162,6 @@ const Highlights = memo(() => {
                                         <p className="text-zinc-500 font-medium leading-relaxed text-sm md:text-base">
                                             {item.description}
                                         </p>
-
-                                        {/* Corner Arrow */}
-                                        <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition duration-300 transform translate-x-4 group-hover:translate-x-0">
-                                            <ArrowRight className={`size-5 ${item.iconColor}`} />
-                                        </div>
                                     </m.div>
                                 );
                             })}

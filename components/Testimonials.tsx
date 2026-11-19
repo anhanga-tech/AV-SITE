@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useSyncExternalStore, memo } from 'react';
-import { ChevronLeft, ChevronRight, Quote, MessageSquareHeart } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
 import { SectionHeader } from './ui/SectionHeader';
 import { ReviewAvatar } from './ui/ReviewAvatar';
@@ -15,10 +15,6 @@ const reviewSummary = getReviewSummary(googleReviewsData);
 
 const ROTATIONS = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2', '-rotate-1', 'rotate-1', '-rotate-2'];
 
-// PERFORMANCE WIN: Static JSX props moved outside to stabilize references
-// for the memoized SectionHeader component.
-const SECTION_BADGE_ICON = <MessageSquareHeart className="size-4 text-red-500 fill-red-500" />;
-const SECTION_TITLE = <>Mural do Amor <span aria-hidden="true">❤️</span></>;
 
 // O mural sai no HTML do prerender (#1971). "há N dias" depende do relógio, então o
 // prerender e o render de hidratação usam a data absoluta, e a relativa entra só depois
@@ -62,10 +58,7 @@ const Testimonials: React.FC = memo(() => {
     >
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
-          badge="Love Notes"
-          badgeIcon={SECTION_BADGE_ICON}
-          title={SECTION_TITLE}
-          subtitle="Depoimentos reais de quem viajou com a gente"
+          title="Quem viajou com a gente"
           className="mb-16"
         />
 

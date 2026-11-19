@@ -1,15 +1,6 @@
 import React, { memo } from 'react';
 import { m } from 'framer-motion';
-import {
-  ChatCircleDots,
-  PaintBrushBroad,
-  CreditCard,
-  AirplaneTilt,
-  Sparkle,
-  ArrowRight,
-  Star,
-  Heart,
-} from '@phosphor-icons/react';
+import { ArrowRight } from '@phosphor-icons/react';
 import { openContactModal } from '../utils/contactForm';
 
 const PATH_D = "M 500 50 C 500 150, 200 150, 200 250 C 200 350, 800 350, 800 450 C 800 550, 200 550, 200 650 C 200 750, 500 750, 500 800";
@@ -19,52 +10,31 @@ const EASE_EXPO = [0.16, 1, 0.3, 1] as const;
 const STEPS = [
   {
     id: 1,
-    icon: <ChatCircleDots className="size-8 text-white" weight="fill" />,
     title: "Vamos conversar?",
     desc: "Nada de formulários chatos. A gente bate um papo no WhatsApp para entender seus sonhos e quanto você quer investir.",
-    color: "bg-brand-yellow",
-    lightColor: "bg-yellow-50",
     borderColor: "border-yellow-200",
-    rotate: "-rotate-2",
-    sticker: <Heart className="size-20 text-yellow-400 drop-shadow-md" weight="fill" />
+    rotate: "-rotate-2"
   },
   {
     id: 2,
-    icon: <PaintBrushBroad className="size-8 text-white" weight="fill" />,
     title: "Desenhando o sonho",
     desc: "Nossos especialistas criam um roteiro dia-a-dia só seu. Ajustamos cada detalhe até você dizer: 'É isso!'",
-    color: "bg-brand-cyan",
-    lightColor: "bg-sky-50",
     borderColor: "border-sky-200",
-    rotate: "rotate-3",
-    sticker: (
-      <div className="relative size-24 drop-shadow-md" aria-hidden="true">
-        <Star className="absolute inset-0 size-24 text-sky-200" weight="fill" />
-        <Star className="absolute inset-0 size-24 text-sky-400" weight="regular" />
-      </div>
-    )
+    rotate: "rotate-3"
   },
   {
     id: 3,
-    icon: <CreditCard className="size-8 text-white" weight="fill" />,
     title: "Burocracia? Deixa com a gente",
     desc: "Aprovado? Ótimo! Nós emitimos voos, hotéis e passeios. Parcelamos tudo e você recebe os vouchers organizadinhos.",
-    color: "bg-emerald-500",
-    lightColor: "bg-emerald-50",
     borderColor: "border-emerald-200",
-    rotate: "-rotate-1",
-    sticker: <div className="text-8xl drop-shadow-md filter hue-rotate-15">✈️</div>
+    rotate: "-rotate-1"
   },
   {
     id: 4,
-    icon: <AirplaneTilt className="size-8 text-white" weight="fill" />,
     title: "Fui! Partiu viajar",
     desc: "Agora é só fazer as malas! E se precisar de algo lá longe? Nosso time fica de plantão 24h por você.",
-    color: "bg-green-500",
-    lightColor: "bg-green-50",
     borderColor: "border-green-200",
-    rotate: "rotate-2",
-    sticker: <div className="text-8xl drop-shadow-md">🏝️</div>
+    rotate: "rotate-2"
   }
 ];
 
@@ -88,20 +58,9 @@ const HowItWorks = memo(() => {
 
       <div className="container mx-auto px-6 relative z-10">
         
-        {/* Header Divertido */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-            <div className="inline-block relative">
-                <span className="absolute -inset-1 block -skew-y-2 bg-brand-yellow rounded-lg" aria-hidden="true"></span>
-                <span className="relative text-brand-dark font-black text-sm uppercase tracking-widest px-2 py-1">Sem Complicação</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-extrabold text-brand-dark mt-6 mb-6 leading-tight">
-                Como a mágica <br className="md:hidden"/> acontece?
-            </h2>
-            <p className="text-xl text-zinc-600 font-medium font-sans">
-                Planejar viagem não precisa ser chato. <br className="hidden md:block"/>
-                Aqui vai funcionar assim: você fala, a gente afia o lápis e monta tudo.
-            </p>
-        </div>
+        <h2 className="text-4xl md:text-6xl font-extrabold text-brand-dark text-center max-w-3xl mx-auto mb-20 leading-tight">
+            Como funciona
+        </h2>
 
         {/* Timeline Container */}
         <div className="relative max-w-5xl mx-auto mb-20">
@@ -159,31 +118,20 @@ const HowItWorks = memo(() => {
                                 {/* Fake Tape Effect */}
                                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-8 bg-white/40 backdrop-blur-sm shadow-sm rotate-1 border-l border-r border-white/60"></div>
                                 
-                                {/* Header: Icon + Number */}
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className={`size-16 rounded-2xl ${step.color} shadow-lg flex items-center justify-center transform -rotate-6 group-hover:rotate-0 transition-transform duration-300`}>
-                                        {step.icon}
-                                    </div>
-                                    {/* Numeral decorativo (1.09:1 de propósito): via ::before e não como
-                                        nó de texto, porque o axe mede contraste até de texto aria-hidden (#1998). */}
-                                    <span
-                                        aria-hidden="true"
-                                        data-ordinal={`0${step.id}`}
-                                        className="font-black text-6xl text-zinc-100 select-none absolute top-4 right-6 z-0 before:content-[attr(data-ordinal)]"
-                                    />
-                                </div>
+                                {/* Numeral decorativo (1.09:1 de propósito): via ::before e não como
+                                    nó de texto, porque o axe mede contraste até de texto aria-hidden (#1998). */}
+                                <span
+                                    aria-hidden="true"
+                                    data-ordinal={`0${step.id}`}
+                                    className="font-black text-6xl text-zinc-100 select-none absolute top-4 right-6 z-0 before:content-[attr(data-ordinal)]"
+                                />
 
                                 {/* Content */}
                                 <div className="relative z-10">
-                                    <h3 className="text-2xl font-bold text-zinc-800 mb-3">{step.title}</h3>
+                                    <h3 className="text-2xl font-bold text-zinc-800 mb-3 pr-20">{step.title}</h3>
                                     <p className="text-zinc-600 leading-relaxed font-medium">
                                         {step.desc}
                                     </p>
-                                </div>
-
-                                {/* Sticker Decoration */}
-                                <div className="absolute -bottom-8 -right-8 transform rotate-12 group-hover:scale-110 transition-transform z-20">
-                                    {step.sticker}
                                 </div>
                             </div>
                             
@@ -209,16 +157,12 @@ const HowItWorks = memo(() => {
                     }}
                     className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow text-left"
                 >
-                    <Sparkle className="size-6 text-brand-yellow" weight="fill" aria-hidden="true" />
                     <span>Quero meu roteiro agora!</span>
                     <div className="size-10 bg-brand-dark rounded-full flex items-center justify-center text-white">
                         <ArrowRight className="size-5" weight="bold" aria-hidden="true" />
                     </div>
                 </button>
             </div>
-            <p className="mt-6 text-zinc-400 font-medium text-sm">
-                (Prometemos: Zero estresse, 100% diversão)
-            </p>
         </div>
 
       </div>

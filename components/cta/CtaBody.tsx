@@ -49,9 +49,6 @@ export function CtaBody() {
       >
         {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
         <input {...honeypotProps} />
-        <p className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-1">
-          Seus dados para contato
-        </p>
 
         <FormField
           id="cta-firstName"
@@ -172,7 +169,7 @@ export function CtaBody() {
         className="btn-specialist flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-hard-yellow hover:shadow-[2px_2px_0px_theme(colors.brand.yellow)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition self-start"
         data-tracking="cta-home-footer"
       >
-        Solicitar meu Orçamento
+        Solicitar meu orçamento
       </button>
     </>
   );

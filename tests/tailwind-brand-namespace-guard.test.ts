@@ -66,7 +66,9 @@ function collectRootFiles(): string[] {
 // anhanga-action + texto Ardósia; baseline na contagem real).
 // 2026-11-03: 476 → 475 ("Saiba Mais" dos cards de destino migrado para
 // anhanga-actionInk no contraste do axe-core 4.14, #1998).
-const BRAND_NAMESPACE_BASELINE = 475;
+// 2026-11-18: 475 → 448 (unslop da home: badges, ícones decorativos e
+// selos removidos de Highlights, HowItWorks, Faq, Blog e CTA).
+const BRAND_NAMESPACE_BASELINE = 448;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];

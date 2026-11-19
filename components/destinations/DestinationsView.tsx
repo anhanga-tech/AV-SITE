@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Compass, MapPin, Minus, Plus, Star, X } from 'lucide-react';
+import { ArrowRight, MapPin, Minus, Plus, Star, X } from 'lucide-react';
 import { SocialShare } from '../SocialShare';
 import { LazyImage } from '../ui/LazyImage';
 import { openContactModal } from '../../utils/contactForm';
@@ -19,12 +19,7 @@ interface DestinationsHeaderProps {
 function DestinationsHeader({ activeFilter, onFilterChange }: DestinationsHeaderProps) {
     return (
         <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-            <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-dashed border-brand-dark bg-yellow-100 text-brand-dark font-black text-xs uppercase tracking-widest shadow-sm transform -rotate-1 mb-4">
-                    <Compass className="size-4" /> Mapa Mundi
-                </div>
-                <h2 className="text-4xl font-black text-brand-dark">Escolha seu <span className="text-brand-cyan relative inline-block">Pin 📍<svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-cyan opacity-40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span></h2>
-            </div>
+            <h2 className="text-4xl font-black text-brand-dark">Escolha seu <span className="text-brand-cyan relative inline-block">pin<svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-cyan opacity-40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span></h2>
 
             {/* Filter Pills - Sticker Style */}
             <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2 md:pb-0 w-full md:w-auto mt-6 md:mt-0 px-1">
@@ -130,7 +125,7 @@ function DestinationCards({ destinations, onDestinationSelect }: DestinationCard
                     <div className="relative h-56 rounded-[1.5rem] overflow-hidden mb-4 border border-zinc-100">
                         <LazyImage
                             src={destination.image}
-                            alt={`${destination.city}, ${destination.country} — pacote de viagem personalizado Anhangá Viagens`}
+                            alt={`${destination.city}, ${destination.country}, pacote de viagem personalizado Anhangá Viagens`}
                             width={600}
                             height={400}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -152,7 +147,7 @@ function DestinationCards({ destinations, onDestinationSelect }: DestinationCard
                         <p className="text-zinc-500 text-sm font-medium mb-4">{destination.description}</p>
 
                         <div className="flex items-center gap-2 text-anhanga-actionInk font-bold text-sm uppercase tracking-wide group-hover:gap-3 transition-[gap,color]">
-                            Saiba Mais <ArrowRight className="size-4" />
+                            Saiba mais <ArrowRight className="size-4" />
                         </div>
                     </div>
                 </button>
