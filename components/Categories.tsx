@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, TrendingUp } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { LazyImage } from './ui/LazyImage';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 
@@ -8,29 +8,20 @@ import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 const POPULAR_DESTINATIONS = [
   {
     title: "Orlando",
-    subtitle: "Magia & Parques",
     image: optimizeRemoteImageUrl('images/categories/orlando-home.jpg', 600, 600),
-    tag: "Destino dos Sonhos",
     rotate: "-rotate-2",
-    color: "bg-blue-100 text-blue-700",
     link: "/orlando/"
   },
   {
     title: "Beto Carrero",
-    subtitle: "Diversão BR",
     image: optimizeRemoteImageUrl('images/categories/beto-carrero-world.jpg', 600, 600),
-    tag: "Radical",
     rotate: "rotate-3",
-    color: "bg-yellow-100 text-yellow-700",
     link: "/beto-carrero/"
   },
   {
     title: "Lollapalooza",
-    subtitle: "Festivais",
     image: optimizeRemoteImageUrl('images/categories/lollapalooza-2026.webp', 600, 600),
-    tag: "Festival",
     rotate: "-rotate-1",
-    color: "bg-emerald-100 text-emerald-700",
     link: "/lollapalooza/"
   }
 ];
@@ -49,16 +40,9 @@ const Categories = memo(() => {
       <div className="container mx-auto px-6">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border-2 border-brand-dark bg-white text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] mb-4">
-              <TrendingUp className="size-4" /> Em Alta
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black text-brand-dark">
-              Todo mundo <br className="md:hidden" /> quer ir pra cá 👇
-            </h2>
-          </div>
-        </div>
+        <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-16">
+          Todo mundo <br className="md:hidden" /> quer ir pra cá
+        </h2>
 
         {/* Polaroid Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 px-4">
@@ -86,16 +70,11 @@ const Categories = memo(() => {
                   fetchPriority="low"
                   className="w-full h-full object-cover filter contrast-[1.1] transition-transform duration-700 group-hover:scale-110"
                 />
-                {/* Tag */}
-                <div className={`absolute top-4 right-4 ${item.color} px-3 py-1 font-bold text-xs uppercase tracking-wide rounded-md shadow-sm`}>
-                  {item.tag}
-                </div>
               </div>
 
               {/* Caption (Handwritten feel) */}
               <div className="text-center">
-                <h3 className="text-2xl font-black text-zinc-800 mb-1 font-sans tracking-tight">{item.title}</h3>
-                <p className="text-zinc-500 font-medium font-serif italic">{item.subtitle}</p>
+                <h3 className="text-2xl font-black text-zinc-800 font-sans tracking-tight">{item.title}</h3>
               </div>
 
               {/* Sticker Decor */}

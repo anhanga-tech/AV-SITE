@@ -14,7 +14,7 @@ test('Destinations map keeps marker selection working after SPA remount', async 
   const orlandoMarker = map.locator('.leaflet-marker-icon').first();
   const dialog = page.getByRole('dialog');
 
-  await expect(destinations.getByText('Mapa Mundi')).toBeVisible({ timeout: 10_000 });
+  await expect(destinations.getByRole('heading', { level: 2, name: /Escolha seu pin/i })).toBeVisible({ timeout: 10_000 });
   await expect(map).toBeVisible();
   await expect(map.locator('.leaflet-marker-icon')).toHaveCount(22);
 

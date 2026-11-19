@@ -114,7 +114,7 @@ const Home: React.FC = () => {
     <>
       <Seo
         title="Agência de Viagens em São Paulo | Anhangá Viagens"
-        description="Agência de viagens em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
+        description="Agência de viagens em São Paulo. Cada roteiro começa do zero, sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
       />
       <WebSiteSchema />

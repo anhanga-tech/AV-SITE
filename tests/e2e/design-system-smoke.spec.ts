@@ -8,14 +8,8 @@ test.describe('Design System — smoke', () => {
     test('SectionHeader renderiza com heading level 2', async ({ page }) => {
         // Testimonials is below the fold — scroll to trigger lazy mount
         await page.locator('#depoimentos').scrollIntoViewIfNeeded();
-        const heading = page.getByRole('heading', { level: 2, name: /Mural do Amor/i });
+        const heading = page.getByRole('heading', { level: 2, name: /Quem viajou com a gente/i });
         await expect(heading).toBeVisible();
-    });
-
-    test('SectionHeader renderiza badge acima do título', async ({ page }) => {
-        await page.locator('#depoimentos').scrollIntoViewIfNeeded();
-        const badge = page.getByText('Love Notes', { exact: false });
-        await expect(badge).toBeVisible();
     });
 
     test('CTA primário na hero está visível e habilitado', async ({ page }) => {

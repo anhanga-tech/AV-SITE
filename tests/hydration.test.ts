@@ -135,7 +135,7 @@ test('Home prerender renders primary content before the footer without streaming
   assert.doesNotMatch(appHtml, /hidden id="S:/);
   assert.doesNotMatch(appHtml, /min-h-\[40vh\] bg-white/);
 
-  const heroIndex = appHtml.indexOf('Sua Próxima');
+  const heroIndex = appHtml.indexOf('Sua próxima');
   const footerIndex = appHtml.indexOf('<footer');
 
   assert.notEqual(heroIndex, -1);
@@ -150,7 +150,7 @@ test('Home prerender keeps the CLS-safe path when URL contains tracking query or
   for (const { appHtml } of results) {
     assert.doesNotMatch(appHtml, /hidden id="S:/);
     assert.doesNotMatch(appHtml, /min-h-\[40vh\] bg-white/);
-    assert.match(appHtml, /Sua Próxima/);
+    assert.match(appHtml, /Sua próxima/);
   }
 });
 
@@ -190,7 +190,7 @@ test('Home prerender ships real testimonials and the contact block in the first-
     appHtml.includes(expectedName),
     `expected reviewer "${displayReviews[0].authorName}" in the prerendered home`
   );
-  assert.match(appHtml, /Anhangá Airlines/);
+  assert.match(appHtml, /Solicitar meu orçamento/);
 
   // Abaixo da dobra: os avatares não podem disputar banda com o topo da home.
   const testimonialsHtml = appHtml.slice(appHtml.indexOf('id="depoimentos"'), appHtml.indexOf('id="contato"'));
