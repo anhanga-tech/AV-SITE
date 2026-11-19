@@ -5,6 +5,8 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
+import { todayInSaoPaulo } from '../lib/blog-schedule.js';
+
 /*
   `pnpm update:dates` (`--all`) forçava `dateModified = hoje` em todos os MDX e
   reinflava o `lastmod` do sitemap que o hook (#1969/#1973) já protegia. Agora
@@ -13,7 +15,8 @@ import path from 'node:path';
 */
 
 const SCRIPTS = path.resolve(import.meta.dirname, '..', 'scripts');
-const TODAY = new Date().toISOString().slice(0, 10);
+// Mesma regra do script: "hoje" no fuso de São Paulo, não em UTC (#2121).
+const TODAY = todayInSaoPaulo();
 
 const post = (frontmatter: string, body: string) => `---\n${frontmatter}\n---\n\n${body}\n`;
 
