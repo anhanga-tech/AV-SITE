@@ -41,7 +41,7 @@
     "@upstash/redis": "^1.41.0",
     "@vitejs/plugin-react": "^6.3.0",
     "autoprefixer": "^10.6.2",
-    "framer-motion": "14.12.0",
+    "framer-motion": "14.13.0",
     "globe.gl": "^2.46.2",
     "leaflet": "1.9.4",
     "lucide-react": "^1.72.0",
