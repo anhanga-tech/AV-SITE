@@ -76,7 +76,7 @@ pnpm install
 
 ### Erro: "process is not defined"
 **Causa**: Variável de ambiente não configurada corretamente
-**Solução**: Verifique se `GEMINI_API_KEY` está configurada na plataforma
+**Solução**: Verifique se `GEMINI_API_KEY` está configurada na plataforma (ou, com `AI_GATEWAY_ENABLED=true`, `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN`)
 
 ### Página branca sem erros no console
 **Causa**: Problema com base path ou caminhos de assets

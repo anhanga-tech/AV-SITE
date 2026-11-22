@@ -95,7 +95,7 @@ Deploy primário em **Cloudflare Pages**. Vercel e Netlify são legados (configs
 **Cloudflare Pages:**
 1. Conecte o repositório no dashboard do Cloudflare Pages.
 2. Build command `pnpm build` · Output `dist` · Node 24 (pinado via `.node-version` e `wrangler.toml`).
-3. Configure os secrets em Settings → Environment Variables (`GEMINI_API_KEY`, Odoo, n8n, Upstash Redis, GitHub OAuth — ver `.env.example`).
+3. Configure os secrets em Settings → Environment Variables (credenciais do Gemini — em produção, as do AI Gateway BYOK: `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_AI_GATEWAY_TOKEN`, ver `docs/ops/deploy.md` —, Odoo, n8n, Upstash Redis, GitHub OAuth — ver `.env.example`).
 4. Deploy automático a cada push em `main`.
 
 **Configuração obrigatória de rate limiting:** configure `UPSTASH_REDIS_REST_URL`,

@@ -6,21 +6,27 @@ O deploy ativo é **Cloudflare Pages** (migrado de Vercel em mai/2026). Handlers
 
 ### Segurança da API Key
 
-O chat usa `/api/generate` como proxy server-side. A chave `GEMINI_API_KEY` deve ficar somente nas variáveis de ambiente da plataforma e não deve ser exposta com prefixo `VITE_`.
+O chat usa `/api/generate` como proxy server-side. Nenhuma credencial do Gemini ou do AI Gateway deve ser exposta ao browser: ficam somente nas variáveis de ambiente da plataforma, nunca com prefixo `VITE_`.
 
-### Cloudflare AI Gateway (opcional)
+### Cloudflare AI Gateway (produção, com BYOK)
 
-O Cloudflare AI Gateway é opcional e controlado por feature flag. Use para monitorar requests, tokens, erros e custo.
+Em produção a chave do Gemini fica guardada no AI Gateway (Provider Keys / BYOK) e o site só guarda a credencial do gateway. Com `AI_GATEWAY_ENABLED=true` o servidor nunca envia `GEMINI_API_KEY` ao Google: a requisição sai **sem** o header `x-goog-api-key` (nem vazio) e sem `key=` na query, só com `cf-aig-authorization` e `cf-aig-byok-alias`, e o gateway injeta a chave guardada (conforme a doc de BYOK da Cloudflare, ele só usa a chave guardada quando o header de autorização do provedor está ausente). Como o SDK `@google/genai` recoloca o `apiKey` no `x-goog-api-key` quando o header falta, `lib/ai/gemini-config.ts` passa ao cliente um `fetch` escopado (`createGatewayFetch`, via `httpOptions.fetch`) que remove esse header antes de a requisição sair.
+
+**Alias efetivo hoje: `chatbot`.** O `wrangler.toml` define `AI_GATEWAY_BYOK_ALIAS = "chatbot"` em `[vars]` e em `[env.production.vars]` (e `CLOUDFLARE_AI_GATEWAY_ID = "av-site"`). O operador precisa cadastrar a chave do Gemini no gateway `av-site` com o alias `chatbot`, ou mudar o alias no `wrangler.toml` para o que foi cadastrado. O default `default` só vale se a variável `AI_GATEWAY_BYOK_ALIAS` for removida. Se o alias configurado não existir em Provider Keys, o chat responde com erro de provedor (fallback de WhatsApp no client).
 
 1. Crie ou selecione um AI Gateway no painel da Cloudflare.
-2. Habilite Authenticated Gateway.
-3. Gere um token com permissão `Run` e salve-o com segurança.
-4. Configure as variáveis server-side no dashboard do Pages:
+2. Em Provider Keys, cadastre a chave do Google AI Studio com o alias efetivo (hoje `chatbot`; sem a variável `AI_GATEWAY_BYOK_ALIAS`, o alias é `default`).
+3. Habilite Authenticated Gateway.
+4. Gere um token com permissão `Run` e salve-o com segurança.
+5. Configure as variáveis server-side no dashboard do Pages:
    - `AI_GATEWAY_ENABLED=true`
-   - `CLOUDFLARE_ACCOUNT_ID`
+   - `CLOUDFLARE_ACCOUNT_ID` (obrigatória)
+   - `CLOUDFLARE_AI_GATEWAY_TOKEN` (obrigatória)
    - `CLOUDFLARE_AI_GATEWAY_ID` (opcional; default: `default`)
-   - `CLOUDFLARE_AI_GATEWAY_TOKEN`
-5. Mantenha `GEMINI_API_KEY` configurada; nesta fase ela ainda é enviada pelo servidor ao endpoint nativo Google AI Studio via Gateway.
+   - `AI_GATEWAY_BYOK_ALIAS` (já definida como `chatbot` no `wrangler.toml`; default `default` só se removida; deve ser o alias cadastrado no passo 2)
+6. `GEMINI_API_KEY` **não é necessária** nesse modo. Se estiver definida, é ignorada e o servidor registra um aviso com o nome da variável (nunca o valor); remova-a do dashboard, sobretudo se for uma chave antiga ou revogada.
+
+Sem `AI_GATEWAY_ENABLED=true` (por exemplo, dev local), o caminho direto continua exigindo `GEMINI_API_KEY`.
 
 ## Checklist de Deploy
 
@@ -28,7 +34,8 @@ O Cloudflare AI Gateway é opcional e controlado por feature flag. Use para moni
 
 - [ ] Configure todas as variáveis de ambiente no dashboard do Cloudflare Pages (Settings → Environment Variables). Consulte `.env.example` para a lista completa.
 - [ ] `RATE_LIMIT_KEY_SECRET` presente em **Preview e Production** antes de publicar a pseudonimização do IP (PR #1828). Gere com `openssl rand -base64 32` e não commite o valor. Sem ele, `/api/generate` e os formulários respondem 503; `/api/auth`, `/api/auth/callback` e `/api/markdown` respondem 429.
-- [ ] Se usar AI Gateway, configure `AI_GATEWAY_ENABLED=true`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_AI_GATEWAY_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN`
+- [ ] Se usar AI Gateway, configure `AI_GATEWAY_ENABLED=true`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_AI_GATEWAY_ID`, `CLOUDFLARE_AI_GATEWAY_TOKEN` (obrigatórias: `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN`); `GEMINI_API_KEY` não é necessária nesse modo
+- [ ] A chave do Gemini está cadastrada no gateway `av-site` com o alias `chatbot` (o `AI_GATEWAY_BYOK_ALIAS` do `wrangler.toml`, em `[vars]` e `[env.production.vars]`) — ou o alias foi alterado no `wrangler.toml` para o cadastrado
 - [ ] Teste o build localmente: `pnpm build && pnpm preview`
 - [ ] Verifique se todas as rotas funcionam corretamente
 - [ ] Teste o chat AI com a chave de produção
@@ -52,7 +59,7 @@ O Cloudflare AI Gateway é opcional e controlado por feature flag. Use para moni
 
 Consulte `.env.example` para a lista completa com descrições. Grupos principais:
 
-- **Gemini AI** (required): `GEMINI_API_KEY`
+- **Gemini AI** (required): `GEMINI_API_KEY` (caminho direto) **ou**, com AI Gateway BYOK, `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_AI_GATEWAY_TOKEN`
 - **Odoo** (required in prod): `ODOO_URL`, `ODOO_DB`, `ODOO_LOGIN`, `ODOO_API_KEY` — CRM ativo; os 5 formulários (lead/contato/quiz/waitlist/nps) postam direto via JSON-RPC
 - **n8n Webhook** (required in prod): `N8N_WEBHOOK_SECRET` — restrito a `purchase-dispatch` (inbound); não é mais usado para intake de formulários
 - **Rate Limiting** (required in prod): `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_KEY_SECRET` (HMAC do IP na chave; ver o checklist acima e a rotação abaixo)
@@ -70,14 +77,14 @@ A chave no Redis é o prefixo do endpoint mais o HMAC do IP com esse secret. Tro
 ### Build falha
 
 - Verifique se todas as dependências estão instaladas: `pnpm install`
-- Verifique se a variável `GEMINI_API_KEY` está configurada
-- Se `AI_GATEWAY_ENABLED=true`, verifique se as variáveis `CLOUDFLARE_*` estão configuradas
+- Sem AI Gateway, verifique se a variável `GEMINI_API_KEY` está configurada
+- Se `AI_GATEWAY_ENABLED=true`, verifique se `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN` estão configuradas
 - Limpe o cache: `rm -rf node_modules dist && pnpm install`
 
 ### Chat AI não funciona em produção
 
-- Verifique se `GEMINI_API_KEY` está configurada corretamente no dashboard do Pages
-- Se usar AI Gateway, confirme que o Gateway autenticado está ativo e que o token tem permissão `Run`
+- Sem AI Gateway, verifique se `GEMINI_API_KEY` está configurada corretamente no dashboard do Pages
+- Se usar AI Gateway, confirme que o Gateway autenticado está ativo, que o token tem permissão `Run` e que o alias em `AI_GATEWAY_BYOK_ALIAS` (hoje `chatbot`, vindo do `wrangler.toml`; `default` só se a variável for removida) existe em Provider Keys
 - Verifique o console do navegador para erros
 
 ### Rotas não funcionam
