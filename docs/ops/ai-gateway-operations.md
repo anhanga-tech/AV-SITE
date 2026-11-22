@@ -9,12 +9,20 @@ O Gateway esperado em producao e `av-site`, configurado em `wrangler.toml` por:
 
 - `AI_GATEWAY_ENABLED = "true"`
 - `CLOUDFLARE_AI_GATEWAY_ID = "av-site"`
-- `AI_GATEWAY_BYOK_ALIAS` (alias da chave do Gemini em Provider Keys; default `default`)
+- `AI_GATEWAY_BYOK_ALIAS = "chatbot"` (alias da chave do Gemini em Provider Keys; em `[vars]` e em
+  `[env.production.vars]`; o default `default` so vale se a variavel for removida)
 - `GEMINI_MODEL = "gemini-3.1-flash-lite"`
 
+A chave do Gemini precisa estar cadastrada no gateway `av-site` com o alias `chatbot` (ou o alias no
+`wrangler.toml` precisa ser mudado para o cadastrado).
+
 A chave do Gemini fica guardada no proprio AI Gateway (Provider Keys / BYOK). Com o Gateway ligado,
-o servidor sempre envia `x-goog-api-key` vazio e `cf-aig-byok-alias`, e o Gateway injeta a chave
-guardada (a Cloudflare so usa a chave guardada quando o header de autorizacao do provedor esta ausente).
+a requisicao sai sem o header `x-goog-api-key` (nem vazio) e sem `key=` na query, apenas com
+`cf-aig-authorization` e `cf-aig-byok-alias`, e o Gateway injeta a chave guardada (a Cloudflare so usa
+a chave guardada quando o header de autorizacao do provedor esta ausente; um valor presente, mesmo
+vazio, e repassado ao Google). O SDK `@google/genai` recoloca o `apiKey` nesse header quando ele falta,
+entao `createGatewayFetch` (`lib/ai/gemini-config.ts`, passado em `httpOptions.fetch`) o remove so nas
+chamadas do cliente do Gemini, sem alterar `globalThis.fetch`.
 `GEMINI_API_KEY` nao e exigida nem enviada nesse modo; se estiver definida, e ignorada e o servidor
 registra um aviso apenas com o nome da variavel. Remova-a do ambiente.
 
