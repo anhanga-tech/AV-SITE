@@ -9,10 +9,17 @@ O Gateway esperado em producao e `av-site`, configurado em `wrangler.toml` por:
 
 - `AI_GATEWAY_ENABLED = "true"`
 - `CLOUDFLARE_AI_GATEWAY_ID = "av-site"`
+- `AI_GATEWAY_BYOK_ALIAS` (alias da chave do Gemini em Provider Keys; default `default`)
 - `GEMINI_MODEL = "gemini-3.1-flash-lite"`
 
-Os segredos `GEMINI_API_KEY`, `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN`
-devem continuar fora do repositorio.
+A chave do Gemini fica guardada no proprio AI Gateway (Provider Keys / BYOK). Com o Gateway ligado,
+o servidor sempre envia `x-goog-api-key` vazio e `cf-aig-byok-alias`, e o Gateway injeta a chave
+guardada (a Cloudflare so usa a chave guardada quando o header de autorizacao do provedor esta ausente).
+`GEMINI_API_KEY` nao e exigida nem enviada nesse modo; se estiver definida, e ignorada e o servidor
+registra um aviso apenas com o nome da variavel. Remova-a do ambiente.
+
+Os segredos `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN` (obrigatorios no modo Gateway)
+devem continuar fora do repositorio e so existem no servidor (Pages Functions), nunca com prefixo `VITE_`.
 
 ## Contrato de privacidade e cache
 

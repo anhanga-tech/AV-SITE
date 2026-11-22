@@ -288,6 +288,13 @@ function logProviderStatus(config: ResolvedGeminiProviderConfig): void {
         useGateway: config.useGateway,
         gatewayId: config.useGateway ? config.gatewayId : undefined,
     });
+
+    if (config.useGateway && config.ignoredEnv.length > 0) {
+        // Só nomes de variáveis: nunca valor, tamanho ou prefixo.
+        logger.warn('SERVER: env vars ignored in AI Gateway BYOK mode', {
+            ignoredEnv: config.ignoredEnv,
+        });
+    }
 }
 
 async function parseGenerateContents(
