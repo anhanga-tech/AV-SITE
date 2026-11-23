@@ -1,6 +1,6 @@
 import { sendGoogleConversion } from '../lib/conversions/google';
 import { sendMetaConversion } from '../lib/conversions/meta';
-import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { buildCorsHeaders, getClientIP, readJsonBodyWithLimit } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { timingSafeEqual } from '../lib/security';
 import { logger } from '../lib/logger';
@@ -8,6 +8,8 @@ import { truncateDetail } from '../lib/n8n-submit-handler';
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 30;
+// A purchase event is a few hundred bytes of ids/contact fields; 16 KB is generous.
+const MAX_REQUEST_BODY_BYTES = 16 * 1024;
 const SANITIZED_DISPATCH_ERROR = 'Conversion dispatch failed';
 
 interface ConversionDispatchPayloadInput {
@@ -288,8 +290,16 @@ async function parseValidatedPayload(
   let body: unknown;
 
   try {
-    body = await request.json();
-  } catch {
+    // Security: cap the body while streaming so a leaked/guessed secret (or a
+    // misbehaving automation) cannot make each request buffer a multi-MB parse.
+    body = await readJsonBodyWithLimit(request, MAX_REQUEST_BODY_BYTES);
+  } catch (error) {
+    if (error instanceof RangeError) {
+      return {
+        ok: false,
+        response: buildJsonResponse({ ok: false, requestId, error: 'Payload too large' }, 413),
+      };
+    }
     return {
       ok: false,
       response: buildJsonResponse({ ok: false, requestId, error: 'Invalid JSON body' }, 400),

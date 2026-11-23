@@ -804,3 +804,62 @@ test('purchase-dispatch should derive a deterministic id for purchase but not fo
   const closeGaEvent = (calls.find(c => c.url.includes('google-analytics'))!.body?.events as Array<Record<string, unknown>>)?.[0];
   assert.equal((closeGaEvent?.params as Record<string, unknown>)?.transaction_id, '123');
 });
+
+test('purchase-dispatch should reject oversized bodies with 413 before dispatching to providers', async (t) => {
+  t.after(() => {
+    restoreEnv();
+    global.fetch = originalFetch;
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  delete process.env.PURCHASE_DISPATCH_ENABLED;
+  delete process.env.UPSTASH_REDIS_REST_URL;
+  delete process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  let providerCalls = 0;
+  global.fetch = (async () => {
+    providerCalls += 1;
+    return new Response('{}', { status: 200 });
+  }) as typeof fetch;
+
+  const oversized = { eventType: 'purchase', dealId: 'deal-1', padding: 'x'.repeat(64 * 1024) };
+  const response = await handler(
+    buildRequest(oversized, 'expected-secret', { 'x-real-ip': `203.0.113.${Math.floor(Math.random() * 200) + 1}` }),
+  );
+
+  assert.equal(response.status, 413);
+  assert.equal(providerCalls, 0);
+});
+
+test('purchase-dispatch should enforce the body cap while streaming even when Content-Length is absent or lies', async (t) => {
+  t.after(() => {
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  delete process.env.PURCHASE_DISPATCH_ENABLED;
+  delete process.env.UPSTASH_REDIS_REST_URL;
+  delete process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  const bytes = new TextEncoder().encode(JSON.stringify({ padding: 'x'.repeat(64 * 1024) }));
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(bytes);
+      controller.close();
+    },
+  });
+  const request = new Request('http://localhost/api/purchase-dispatch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Webhook-Secret': 'expected-secret',
+      'Content-Length': '10',
+      'x-real-ip': `203.0.113.${Math.floor(Math.random() * 200) + 1}`,
+    },
+    body: stream,
+    duplex: 'half',
+  } as RequestInit);
+
+  const response = await handler(request);
+  assert.equal(response.status, 413);
+});
