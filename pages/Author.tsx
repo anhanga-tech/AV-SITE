@@ -96,7 +96,7 @@ const Author: React.FC = () => {
                     href={author.social.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`Instagram de ${author.name}`}
+                    aria-label={`Instagram de ${author.name} (abre em nova aba)`}
                     className="flex size-11 items-center justify-center rounded-full bg-anhanga-action/10 text-anhanga-actionInk transition-colors hover:bg-anhanga-actionInk hover:text-white"
                   >
                     <InstagramLogo className="size-5" weight="fill" aria-hidden="true" />
@@ -107,7 +107,7 @@ const Author: React.FC = () => {
                     href={author.social.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`LinkedIn de ${author.name}`}
+                    aria-label={`LinkedIn de ${author.name} (abre em nova aba)`}
                     className="flex size-11 items-center justify-center rounded-full bg-anhanga-action/10 text-anhanga-actionInk transition-colors hover:bg-anhanga-actionInk hover:text-white"
                   >
                     <LinkedinLogo className="size-5" weight="fill" aria-hidden="true" />

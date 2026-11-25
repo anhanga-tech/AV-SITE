@@ -58,7 +58,7 @@ export const ConsultoresSection: React.FC<ConsultoresSectionProps> = ({ team }) 
                     href={member.social.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`Instagram de ${member.name}`}
+                    aria-label={`Instagram de ${member.name} (abre em nova aba)`}
                     className="size-11 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
                   >
                     <InstagramLogo className="size-4" weight="fill" aria-hidden="true" />
@@ -69,7 +69,7 @@ export const ConsultoresSection: React.FC<ConsultoresSectionProps> = ({ team }) 
                     href={member.social.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`LinkedIn de ${member.name}`}
+                    aria-label={`LinkedIn de ${member.name} (abre em nova aba)`}
                     className="size-11 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
                   >
                     <LinkedinLogo className="size-4" weight="fill" aria-hidden="true" />
