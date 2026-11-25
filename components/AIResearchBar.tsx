@@ -78,7 +78,7 @@ const AIResearchBar: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             title={assistant.name}
-            aria-label={`Perguntar no ${assistant.name} sobre a Anhangá`}
+            aria-label={`Perguntar no ${assistant.name} sobre a Anhangá (abre em nova aba)`}
             onClick={() => pushAiResearchClick(assistant.id, PLACEMENT)}
             className="inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-white/95 p-2.5 shadow-lg shadow-black/10 transition hover:scale-110 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-yellow"
           >

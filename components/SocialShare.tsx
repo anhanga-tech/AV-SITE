@@ -143,7 +143,7 @@ function SocialShareFull({ url, title, excerpt, className = "" }: ShareVariantPr
                     rel="noopener noreferrer"
                     className="min-h-12 min-w-12 flex items-center justify-center bg-[#25D366] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
                     title="Compartilhar no WhatsApp"
-                    aria-label="Compartilhar no WhatsApp"
+                    aria-label="Compartilhar no WhatsApp (abre em nova aba)"
                     onMouseEnter={prefetchHaptics}
                     onClick={() => {
                         import('../utils/haptics')
@@ -159,7 +159,7 @@ function SocialShareFull({ url, title, excerpt, className = "" }: ShareVariantPr
                     rel="noopener noreferrer"
                     className="min-h-12 min-w-12 flex items-center justify-center bg-[#1877F2] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1877F2]"
                     title="Compartilhar no Facebook"
-                    aria-label="Compartilhar no Facebook"
+                    aria-label="Compartilhar no Facebook (abre em nova aba)"
                     onMouseEnter={prefetchHaptics}
                     onClick={() => {
                         import('../utils/haptics')
@@ -175,7 +175,7 @@ function SocialShareFull({ url, title, excerpt, className = "" }: ShareVariantPr
                     rel="noopener noreferrer"
                     className="min-h-12 min-w-12 flex items-center justify-center bg-[#0A66C2] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0A66C2]"
                     title="Compartilhar no LinkedIn"
-                    aria-label="Compartilhar no LinkedIn"
+                    aria-label="Compartilhar no LinkedIn (abre em nova aba)"
                     onMouseEnter={prefetchHaptics}
                     onClick={() => {
                         import('../utils/haptics')
