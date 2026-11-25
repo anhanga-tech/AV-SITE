@@ -38,8 +38,8 @@ importers:
   .:
     dependencies:
       '@google/genai':
-        specifier: ^3.4.0
-        version: 3.4.0(@modelcontextprotocol/sdk@1.32.1(zod@4.6.7))
+        specifier: ^3.5.0
+        version: 3.5.0(@modelcontextprotocol/sdk@1.32.1(zod@4.6.7))
       '@mdx-js/react':
         specifier: ^3.1.1
         version: 3.1.1(@types/react@19.3.0)(react@19.3.1)
@@ -675,8 +675,8 @@ packages:
     resolution: {integrity: sha512-IkO+/KEUvwbVpiURZg+P7zF74z5Jxe0UgJxVni+RtoHQ6IZieXaO02kmadomap/q+l6bc/jdPGGqTjhuZnuz1Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@google/genai@3.4.0':
-    resolution: {integrity: sha512-qjsg+KMRSUmQSkg/BVwcbgE/ROVo91Lx933SOicDlS7viU+Z7sBwK/c8TMvW/9W0OvBy17rwa+/sXn0kdKrDZw==}
+  '@google/genai@3.5.0':
+    resolution: {integrity: sha512-A305FnkyvO+jQSBo6OJL5YEvfJLDAAbjut/oWoKtkEoUpJ+lugbI5byN6omIc0wEgxqR1Vwr/36fP0TQp6WKxg==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
@@ -2898,8 +2898,8 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  csstype@3.2.3:
-    resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+  csstype@3.2.4:
+    resolution: {integrity: sha512-PoKaoPzQapnEoqUSnHx1u6W6ku8CVEgKsnpmmzU3m1nwkidpPBQ8V/Zq2+bWNrsOKoKLwTGdbx6xF7BXP1zLVQ==}
 
   d3-array@3.2.4:
     resolution: {integrity: sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==}
@@ -6603,7 +6603,7 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@google/genai@3.4.0(@modelcontextprotocol/sdk@1.32.1(zod@4.6.7))':
+  '@google/genai@3.5.0(@modelcontextprotocol/sdk@1.32.1(zod@4.6.7))':
     dependencies:
       google-auth-library: 10.9.1
       p-retry: 4.6.2
@@ -7849,7 +7849,7 @@ snapshots:
 
   '@types/react@19.3.0':
     dependencies:
-      csstype: 3.2.3
+      csstype: 3.2.4
 
   '@types/retry@0.12.0': {}
 
@@ -8585,7 +8585,7 @@ snapshots:
 
   cssesc@3.0.0: {}
 
-  csstype@3.2.3: {}
+  csstype@3.2.4: {}
 
   d3-array@3.2.4:
     dependencies:
