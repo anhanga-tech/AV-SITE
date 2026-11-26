@@ -52,6 +52,7 @@ function validateContactRequest(body: unknown): ValidationResult<SubmitContactRe
 }
 
 export default createOdooSubmitHandler({
+    leadCreatedForm: 'submit-contact',
     logScope: 'SUBMIT_CONTACT',
     config: {
         missingStatus: 503,

@@ -15,7 +15,9 @@ import {
     type DispatchConfigCheck,
     type N8nErrorClassification,
     type MaybeAsyncValidationResult,
+    type SubmitRuntime,
 } from './n8n-submit-handler';
+import { notifyLeadCreated, type LeadCreatedForm } from './lead-created-webhook';
 import { buildLeadFields, buildPartnerFields, type OdooLeadInput } from './odoo-lead-mapping';
 import { prepareSubmissionConsent } from './submission-consent';
 import { getOdooConfig, openOdooSession } from '../services/odoo';
@@ -50,6 +52,36 @@ export interface CreateOdooSubmitHandlerOptions<TData> {
     onError?: (params: { data: TData; requestId: string; classification: N8nErrorClassification }) => Record<string, unknown> | void;
     /** Runs only when the Odoo write throws — see CreateSubmitHandlerOptions.onSendFailure. */
     onSendFailure?: (data: TData, requestId: string) => void | Promise<void>;
+    /**
+     * Form name sent to the lead agent's webhook (lib/lead-created-webhook.ts)
+     * when this form creates a new `crm.lead`. Omit for partner-only forms.
+     */
+    leadCreatedForm?: LeadCreatedForm;
+}
+
+/**
+ * Schedules the lead-created webhook after the response. With `waitUntil`
+ * (Cloudflare Pages) the isolate stays alive for it; without it (local dev)
+ * it runs detached. `notifyLeadCreated` never throws, so neither path can
+ * fail or delay the form.
+ */
+function scheduleLeadCreatedNotice(leadId: number, form: LeadCreatedForm, runtime: SubmitRuntime): void {
+    const notice = notifyLeadCreated({ leadId, form });
+    if (!runtime.waitUntil) {
+        void notice;
+        return;
+    }
+    try {
+        runtime.waitUntil(notice);
+    } catch (error) {
+        // The lead already exists in Odoo: a platform hiccup here must not
+        // turn the form's success into an error.
+        logger.warn('LEAD_CREATED_WEBHOOK', {
+            stage: 'wait_until_failed',
+            form,
+            errorName: error instanceof Error ? error.name : typeof error,
+        });
+    }
 }
 
 /**
@@ -75,7 +107,11 @@ async function resolveIdempotencyKey(input: OdooLeadInput): Promise<string> {
 }
 
 /** Persists an Odoo input: upsert partner (dedup by e-mail), then optional lead. */
-async function sendToOdoo(input: OdooLeadInput): Promise<void> {
+async function sendToOdoo(
+    input: OdooLeadInput,
+    runtime: SubmitRuntime = {},
+    leadCreatedForm?: LeadCreatedForm,
+): Promise<void> {
     const config = getOdooConfig();
     if (!config) throw new Error('ODOO_ERROR:503:Odoo config missing');
 
@@ -147,13 +183,19 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
         const leadFields = buildLeadFields(gated, partnerId, idempotencyKey, { includeConversionFields });
         const campaignId = await campaignIdPromise;
         if (campaignId !== undefined) leadFields.campaign_id = campaignId;
-        await session.createLead(leadFields, idempotencyKey);
+        // onCreated fires only for a record this call created: an idempotent
+        // replay resolving to an existing lead does not notify again.
+        await session.createLead(leadFields, idempotencyKey, {
+            onCreated: leadCreatedForm
+                ? (leadId) => scheduleLeadCreatedNotice(leadId, leadCreatedForm, runtime)
+                : undefined,
+        });
     }
 }
 
 export function createOdooSubmitHandler<TData>(
     options: CreateOdooSubmitHandlerOptions<TData>,
-): (request: Request) => Promise<Response> {
+): (request: Request, runtime?: SubmitRuntime) => Promise<Response> {
     const errorOptions: ClassifyN8nErrorOptions = { ...options.error, errorPattern: ODOO_ERROR_PATTERN };
 
     return createSubmitHandler<TData, OdooLeadInput>({
@@ -178,7 +220,7 @@ export function createOdooSubmitHandler<TData>(
                 return options.checkExtraConfig?.() ?? { ok: true };
             },
             buildPayload: (data) => options.buildInput(data),
-            send: (_requestId, input) => sendToOdoo(input),
+            send: (_requestId, input, runtime) => sendToOdoo(input, runtime, options.leadCreatedForm),
             classifyError: (error) => classifyN8nSubmitError(error, errorOptions),
             failureStage: 'odoo_failed',
         },

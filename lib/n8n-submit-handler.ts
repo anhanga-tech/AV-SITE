@@ -126,11 +126,20 @@ export interface SubmitDispatch<TData, TPayload> {
     /** Builds the outbound payload from validated data. */
     buildPayload: (data: TData, requestId: string, ctx: N8nSubmitRequestContext) => TPayload;
     /** Sends the payload to the provider; throws a normalized error on failure. */
-    send: (requestId: string, payload: TPayload) => Promise<unknown>;
+    send: (requestId: string, payload: TPayload, runtime: SubmitRuntime) => Promise<unknown>;
     /** Classifies a thrown send error into the structured response shape. */
     classifyError: (error: unknown) => N8nErrorClassification;
     /** Log `stage` used for non-internal send failures. */
     failureStage?: string;
+}
+
+/**
+ * Runtime hooks from the platform adapter (functions/api/*.ts). `waitUntil`
+ * keeps after-response work (e.g. a notification webhook) alive without
+ * delaying the form's response. Absent in local dev and most tests.
+ */
+export interface SubmitRuntime {
+    waitUntil?: (promise: Promise<unknown>) => void;
 }
 
 /** Provider-agnostic options for the shared submit machine. */
@@ -263,8 +272,8 @@ function buildWebhookErrorResponse<TData, TPayload>(
  */
 export function createSubmitHandler<TData, TPayload = unknown>(
     options: CreateSubmitHandlerOptions<TData, TPayload>,
-): (request: Request) => Promise<Response> {
-    return async function handler(request: Request): Promise<Response> {
+): (request: Request, runtime?: SubmitRuntime) => Promise<Response> {
+    return async function handler(request: Request, runtime: SubmitRuntime = {}): Promise<Response> {
         const requestId = createRequestId();
         const corsHeaders = buildCorsHeaders();
         const env: RequestEnv<TData, TPayload> = { options, requestId, corsHeaders };
@@ -361,7 +370,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
 
         try {
             const payload = options.dispatch.buildPayload(data, requestId, ctx);
-            await options.dispatch.send(requestId, payload);
+            await options.dispatch.send(requestId, payload, runtime);
         } catch (error: unknown) {
             await options.onSendFailure?.(data, requestId);
             return buildWebhookErrorResponse(env, data, error, responseHeaders);

@@ -70,6 +70,8 @@ PROPOSAL_PAGES_ENABLED=       # 'true' libera propostas com página (type infotr
 PROPOSAL_WEBHOOK_URL=         # Receptor (https) do aviso de abertura de proposta (lib/proposal-webhook.ts)
 PROPOSAL_WEBHOOK_KEY=         # Bearer da automação receptora (chave de envio do painel da Clara)
 PROPOSAL_WEBHOOK_SECRET=      # HMAC-SHA256 do envelope do aviso de abertura; o mesmo valor no receptor
+OPENBOT_LEAD_WEBHOOK_URL=     # Receptor (https) do aviso de crm.lead novo para a agente Lis (lib/lead-created-webhook.ts)
+OPENBOT_LEAD_WEBHOOK_SECRET=  # HMAC-SHA256 do aviso de lead novo; o mesmo valor no receptor — ver docs/ops/lead-webhook-openbot.md
 
 # Rate limiting (required in prod — module-level state resets per request on Cloudflare)
 UPSTASH_REDIS_REST_URL=

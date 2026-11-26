@@ -182,15 +182,24 @@ export interface UpsertPartnerOptions {
     preserveName?: boolean;
 }
 
+export interface CreateLeadOptions {
+    onCreated?: (leadId: number) => void;
+}
+
 export interface OdooSession {
     upsertPartner: (fields: OdooPartnerFields, options?: UpsertPartnerOptions) => Promise<number>;
     /**
      * Creates a `crm.lead`, or returns the id of one already created for the
      * same `idempotencyKey` (issue #1136) — a retry, duplicate delivery, or a
      * client that never saw the first attempt's response must not create a
-     * second opportunity.
+     * second opportunity. `options.onCreated` runs only when this call
+     * actually created the record, never when it resolved an existing one.
      */
-    createLead: (fields: Record<string, unknown>, idempotencyKey?: string) => Promise<number>;
+    createLead: (
+        fields: Record<string, unknown>,
+        idempotencyKey?: string,
+        options?: CreateLeadOptions,
+    ) => Promise<number>;
     /** Finds a `utm.campaign` by exact name, creating one if none matches. */
     resolveCampaignId: (name: string) => Promise<number>;
     /**
@@ -270,10 +279,13 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
             }
             return executeKw<number>(config, uid, 'res.partner', 'create', [fields], deadline);
         },
-        async createLead(fields, idempotencyKey) {
-            if (!idempotencyKey) {
-                return executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
-            }
+        async createLead(fields, idempotencyKey, options) {
+            const create = async (): Promise<number> => {
+                const id = await executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
+                options?.onCreated?.(id);
+                return id;
+            };
+            if (!idempotencyKey) return create();
 
             // Odoo has no unique constraint to lean on, so the lock below only
             // narrows the concurrent-duplicate window — this find-before-create
@@ -305,7 +317,7 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
             return withLeadIdempotencyLock(idempotencyKey, async () => {
                 const existingId = await findExisting();
                 if (existingId) return existingId;
-                return executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
+                return create();
             });
         },
         async findPartnerIdByEmail(email) {
