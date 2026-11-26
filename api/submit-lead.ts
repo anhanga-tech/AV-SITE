@@ -23,6 +23,7 @@ export function classifySubmitLeadError(error: unknown): N8nErrorClassification 
 }
 
 export default createOdooSubmitHandler({
+    leadCreatedForm: 'submit-lead',
     logScope: 'SUBMIT_LEAD',
     config: {
         missingStatus: 500,
